@@ -15,7 +15,7 @@ server.get("/api", (req, res) => {
    res.json(["nothing here... yet"]);
 });
 
-server.use("/api/user", userRouter);
+server.use("/api/users", userRouter);
 
 //404 not found
 server.use((req, res) => {
