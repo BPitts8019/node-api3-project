@@ -21,6 +21,13 @@ server.use((req, res) => {
 });
 
 //custom middleware
-function logger(req, res, next) {}
+function logger(req, res, next) {
+   const today = new Date();
+   const date = `${today.getMonth()}/${today.getDate()}/${today.getFullYear()}`;
+   const timestamp = today.toLocaleTimeString('en-US');
+   console.log(`${date} ${timestamp}: ${req.method.toUpperCase()} ${req.url}`);
+   
+   next();
+}
 
 module.exports = server;
