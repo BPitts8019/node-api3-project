@@ -1,15 +1,13 @@
 const express = require("express");
 const server = express();
+const welcomeRouter = require("./routers/welcome");
 const usersRouter = require("./routers/users");
 
 //apply global middleware
 server.use(express.json());
 
 //enpoint routing
-server.get("/", (req, res) => {
-   res.send("<h2>Welcome to SUM SOCIAL API</h>");
-});
-
+server.use("/", welcomeRouter);
 server.use("/api/users", usersRouter);
 
 //start the server
