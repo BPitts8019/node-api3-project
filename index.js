@@ -1,7 +1,6 @@
 const express = require("express");
 const server = express();
-const usersRouter = require("./routers/users");
-const postsRouter = require("./routers/posts");
+const userRouter = require("./users/userRouter");
 
 //apply global middleware
 server.use(express.json());
@@ -16,8 +15,7 @@ server.get("/api", (req, res) => {
    res.json(["nothing here... yet"]);
 });
 
-server.use("/api/users", usersRouter);
-server.use("/api/posts", postsRouter);
+server.use("/api/user", userRouter);
 
 //404 not found
 server.use((req, res) => {
