@@ -37,30 +37,21 @@ router.put('/:id', (req, res) => {
 });
 
 //custom middleware
-
-function validateUserId(req, res, next) {
-   // try {
+async function validateUserId(req, res, next) {
+   try {
       console.log("before db call");
       console.log(req.params.id);
-      userDb.getById(Number(req.params.id))
-         .then(user => {
-            console.log(user);
-            next();
-         })
-         .catch(err => {
-            res.status(500).json({ error: "The user information could not be retrieved." });
-         })
-      
+      const user = await userDb.getById(Number(req.params.id))
 
-      // if (!user) {
-      //    res.status(400).json({ message: "invalid user id" });
-      // }
+      if (!user) {
+         res.status(400).json({ message: "invalid user id" });
+      }
       
-      // req.user = user;
-      // next();
-   // } catch (error) {
-      
-   // }
+      req.user = user;
+      next();
+   } catch (error) {
+      res.status(500).json({ error: "The user information could not be retrieved." });
+   }
 }
 
 function validateUser(req, res, next) {
