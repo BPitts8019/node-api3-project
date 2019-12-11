@@ -24,8 +24,11 @@ router.get('/:id', validateUserId, (req, res) => {
    res.json(req.user);
 });
 
-router.get('/:id/posts', (req, res) => {
-  // do your magic!
+router.get('/:id/posts', validateUserId, async (req, res) => {
+   const userPosts = await userDb.getUserPosts(req.user.id);
+   console.log(userPosts);
+
+   res.json(userPosts);
 });
 
 router.delete('/:id', (req, res) => {
