@@ -67,8 +67,24 @@ router.put('/:id', validateUserId, validateUser, async (req, res) => {
    }
 });
 
+/**
+ * DELETE	/api/users/:id
+ * Deletes a user with the specified id
+ * @param {number} id
+ * @returns {Object} the user that was deleted
+ */
 router.delete('/:id', validateUserId, async (req, res) => {
-
+   try {
+      const numFiles = await userDb.remove(req.user.id);
+      
+      console.log(`User ${req.user.id} (${req.user.name}) deleted`);
+      res.json(req.user);
+   } catch (error) {
+      res.status(500).json({ 
+         response: error.response || error,
+         message: "The user could not be deleted." 
+      });
+   }
 });
 
 /**
