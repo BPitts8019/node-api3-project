@@ -10,15 +10,12 @@ const router = express.Router();
  * @param {string} name 
  * @returns {Object} the new user
  */
-router.post('/', validateUser, async (req, res) => {
+router.post('/', validateUser, async (req, res, next) => {
    try {
       const newUser = await userDb.insert({name: req.body.name});
       res.json(newUser);
    } catch (error) {
-      res.status(500).json({ 
-         response: error.response,
-         message: "There was an error while creating the user"
-      });
+      next(new Error("There was an error while creating the user"));
    }
 });
 
@@ -27,12 +24,12 @@ router.post('/', validateUser, async (req, res) => {
  * Retrieves all users from the database.
  * @returns {Array} list of all the users in the database
  */
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
    try {
       const users = await userDb.get();
       res.json(users);
    } catch (error) {
-      res.status(500).json({ error: "The user information could not be retrieved." });
+      next(new Error("The user information could not be retrieved."));
    }
 });
 
@@ -53,17 +50,14 @@ router.get('/:id', validateUserId, (req, res) => {
  * @param {string} name
  * @returns {Object} the updated user with the specified id
  */
-router.put('/:id', validateUserId, validateUser, async (req, res) => {
+router.put('/:id', validateUserId, validateUser, async (req, res, next) => {
    try {
       const numRecs = await userDb.update(req.user.id, {name: req.body.name});
       console.log(`${numRecs} updated`);
       const user = await userDb.getById(req.user.id);
       res.json(user);
    } catch (error) {
-      res.status(500).json({ 
-         response: error.response || error,
-         message: "The user could not be updated." 
-      });
+      next(new Error("The user could not be updated."));
    }
 });
 
@@ -73,17 +67,14 @@ router.put('/:id', validateUserId, validateUser, async (req, res) => {
  * @param {number} id
  * @returns {Object} the user that was deleted
  */
-router.delete('/:id', validateUserId, async (req, res) => {
+router.delete('/:id', validateUserId, async (req, res, next) => {
    try {
       const numFiles = await userDb.remove(req.user.id);
       
       console.log(`User ${req.user.id} (${req.user.name}) deleted`);
       res.json(req.user);
    } catch (error) {
-      res.status(500).json({ 
-         response: error.response || error,
-         message: "The user could not be deleted." 
-      });
+      next(new Error("The user could not be deleted."));
    }
 });
 
@@ -93,10 +84,13 @@ router.delete('/:id', validateUserId, async (req, res) => {
  * @param {number} id 
  * @returns {Array} the user posts
  */
-router.get('/:id/posts', validateUserId, async (req, res) => {
-   const userPosts = await userDb.getUserPosts(req.user.id);
-
-   res.json(userPosts);
+router.get('/:id/posts', validateUserId, async (req, res, next) => {
+   try {
+      const userPosts = await userDb.getUserPosts(req.user.id);
+      res.json(userPosts);
+   } catch (error) {
+      next(new Error("The user's posts could not be retrieved."));
+   }
 });
 
 /**
@@ -106,19 +100,15 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
  * @param {string} text
  * @returns {Object} the new user post
  */
-router.post('/:id/posts', validatePost, validateUserId, async (req, res) => {
+router.post('/:id/posts', validatePost, validateUserId, async (req, res, next) => {
    try {
-      console.log(req.user);
       const newPost = await postDb.insert({
          user_id: req.user.id,
          text: req.body.text
       });
       res.json(newPost);
    } catch (error) {
-      res.status(500).json({ 
-         response: error.response || error,
-         message: "The user post could not be created." 
-      });
+      next(new Error("The user post could not be created."));
    }
 });
 
@@ -140,7 +130,7 @@ async function validateUserId(req, res, next) {
       req.user = user;
       next();
    } catch (error) {
-      res.status(500).json({ error: "The user information could not be retrieved." });
+      next(new Error("The user information could not be retrieved."));
    }
 }
 

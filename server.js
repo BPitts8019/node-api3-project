@@ -20,6 +20,14 @@ server.use((req, res) => {
    });
 });
 
+//Catch 500 errors
+server.use((error, req, res, next) => {
+   console.log(error.toString());
+   res.status(500).json({
+      data: error.toString()
+   });
+});
+
 //custom middleware
 function logger(req, res, next) {
    const today = new Date();
