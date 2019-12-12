@@ -9,10 +9,23 @@ const router = express.Router();
  * @param {string} name 
  * @returns {Object} the new user
  */
-router.post('/', async (req, res) => {
-
+router.post('/', validateUser, async (req, res) => {
+   try {
+      const newUser = await userDb.insert({name: req.body.name});
+      res.json(newUser);
+   } catch (error) {
+      res.status(500).json({ 
+         response: error.response,
+         message: "There was an error while creating the user"
+      });
+   }
 });
 
+/**
+ * GET	/api/users
+ * Retrieves all users from the database.
+ * @returns {Array} list of all the users in the database
+ */
 router.get('/', async (req, res) => {
    try {
       const users = await userDb.get();
@@ -24,6 +37,7 @@ router.get('/', async (req, res) => {
 
 
 router.get('/:id', validateUserId, (req, res) => {
+   console.log("Get User by ID");
    res.json(req.user);
 });
 
@@ -65,7 +79,7 @@ async function validateUserId(req, res, next) {
       const user = await userDb.getById(Number(req.params.id))
 
       if (!user) {
-         res.status(400).json({ message: "invalid user id" });
+         return res.status(400).json({ message: "invalid user id" });
       }
       
       req.user = user;
@@ -76,7 +90,15 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
+   if (!req.body) {
+      return res.status(400).json({ message: "missing user data" });
+   }
 
+   if (!req.body.name) {
+      return res.status(400).json({ message: "missing required name field" });
+   };
+
+   next();
 }
 
 function validatePost(req, res, next) {
