@@ -3,12 +3,14 @@ const userDb = require("./userDb");
 
 const router = express.Router();
 
+/**
+ * POST	/api/users
+ * Creates a new user using the information sent inside the request body.
+ * @param {string} name 
+ * @returns {Object} the new user
+ */
 router.post('/', async (req, res) => {
 
-});
-
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
 });
 
 router.get('/', async (req, res) => {
@@ -20,9 +22,19 @@ router.get('/', async (req, res) => {
    }
 });
 
+
 router.get('/:id', validateUserId, (req, res) => {
    res.json(req.user);
 });
+
+router.put('/:id', (req, res) => {
+   // do your magic!
+});
+
+router.delete('/:id', (req, res) => {
+   // do your magic!
+});
+
 
 router.get('/:id/posts', validateUserId, async (req, res) => {
    const userPosts = await userDb.getUserPosts(req.user.id);
@@ -31,13 +43,19 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
    res.json(userPosts);
 });
 
-router.delete('/:id', (req, res) => {
+router.post('/:id/posts', (req, res) => {
   // do your magic!
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
-});
+
+
+
+
+
+
+
+
+
 
 //custom middleware
 async function validateUserId(req, res, next) {
