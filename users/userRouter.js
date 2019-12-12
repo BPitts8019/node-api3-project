@@ -67,7 +67,7 @@ router.put('/:id', validateUserId, validateUser, async (req, res) => {
    }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, async (req, res) => {
 
 });
 
@@ -107,6 +107,12 @@ router.post('/:id/posts', validatePost, validateUserId, async (req, res) => {
 });
 
 //custom middleware
+/**
+ * validateUserId
+ * Validates the user id on every request that expects a user id parameter. If the 
+ * user exists, then the user object is attatched to the request object.
+ * @param {number} id
+ */
 async function validateUserId(req, res, next) {
    try {
       const user = await userDb.getById(Number(req.params.id))
@@ -122,6 +128,11 @@ async function validateUserId(req, res, next) {
    }
 }
 
+/**
+ * validateUser
+ * validates the body on a request to create a new user.
+ * @param {string} name
+ */
 function validateUser(req, res, next) {
    if (!req.body || Object.entries(req.body).length === 0) {
       return res.status(400).json({ message: "missing user data" });
@@ -134,6 +145,11 @@ function validateUser(req, res, next) {
    next();
 }
 
+/**
+ * validatePost
+ * validates the body on a request to create a new post
+ * @param {string} text
+ */
 function validatePost(req, res, next) {
    if (!req.body || Object.entries(req.body).length === 0) {
       return res.status(400).json({ message: "missing post data" });
