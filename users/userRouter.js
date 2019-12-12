@@ -1,5 +1,6 @@
 const express = require('express');
 const userDb = require("./userDb");
+const postDb = require("../posts/postDb");
 
 const router = express.Router();
 
@@ -35,7 +36,12 @@ router.get('/', async (req, res) => {
    }
 });
 
-
+/**
+ * GET	/api/users/:id
+ * Retrieves a user with the specified id
+ * @param {number} id 
+ * @returns {Object} the user with the specified id
+ */
 router.get('/:id', validateUserId, (req, res) => {
    console.log("Get User by ID");
    res.json(req.user);
@@ -49,16 +55,39 @@ router.delete('/:id', (req, res) => {
    // do your magic!
 });
 
-
+/**
+ * GET	/api/users/:id/posts
+ * Retrieves all of the posts by the user with the specified id
+ * @param {number} id 
+ * @returns {Array} the user posts
+ */
 router.get('/:id/posts', validateUserId, async (req, res) => {
    const userPosts = await userDb.getUserPosts(req.user.id);
-   console.log(userPosts);
 
    res.json(userPosts);
 });
 
-router.post('/:id/posts', (req, res) => {
-  // do your magic!
+/**
+ * POST	/api/users/:id/posts
+ * Creates a new post for the user with the specified id
+ * @param {number} id 
+ * @param {string} text
+ * @returns {Object} the new user post
+ */
+router.post('/:id/posts', validatePost, validateUserId, async (req, res) => {
+   try {
+      console.log(req.user);
+      const newPost = await postDb.insert({
+         user_id: req.user.id,
+         text: req.body.text
+      });
+      res.json(newPost);
+   } catch (error) {
+      res.status(500).json({ 
+         response: error.response,
+         message: "The user post could not be created." 
+      });
+   }
 });
 
 
@@ -102,7 +131,15 @@ function validateUser(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  // do your magic!
+   if (!req.body || Object.entries(req.body).length === 0) {
+      return res.status(400).json({ message: "missing post data" });
+   }
+
+   if (!req.body.text) {
+      return res.status(400).json({ message: "missing required text field" });
+   }
+
+   next();
 }
 
 module.exports = router;
