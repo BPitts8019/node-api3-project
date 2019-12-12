@@ -90,7 +90,7 @@ async function validateUserId(req, res, next) {
 }
 
 function validateUser(req, res, next) {
-   if (!req.body) {
+   if (!req.body || Object.entries(req.body).length === 0) {
       return res.status(400).json({ message: "missing user data" });
    }
 
