@@ -43,16 +43,32 @@ router.get('/', async (req, res) => {
  * @returns {Object} the user with the specified id
  */
 router.get('/:id', validateUserId, (req, res) => {
-   console.log("Get User by ID");
    res.json(req.user);
 });
 
-router.put('/:id', (req, res) => {
-   // do your magic!
+/**
+ * PUT	/api/users/:id
+ * Updates a user with the specified id
+ * @param {number} id
+ * @param {string} name
+ * @returns {Object} the updated user with the specified id
+ */
+router.put('/:id', validateUserId, validateUser, async (req, res) => {
+   try {
+      const numRecs = await userDb.update(req.user.id, {name: req.body.name});
+      console.log(`${numRecs} updated`);
+      const user = await userDb.getById(req.user.id);
+      res.json(user);
+   } catch (error) {
+      res.status(500).json({ 
+         response: error.response || error,
+         message: "The user could not be updated." 
+      });
+   }
 });
 
 router.delete('/:id', (req, res) => {
-   // do your magic!
+
 });
 
 /**
@@ -84,27 +100,15 @@ router.post('/:id/posts', validatePost, validateUserId, async (req, res) => {
       res.json(newPost);
    } catch (error) {
       res.status(500).json({ 
-         response: error.response,
+         response: error.response || error,
          message: "The user post could not be created." 
       });
    }
 });
 
-
-
-
-
-
-
-
-
-
-
 //custom middleware
 async function validateUserId(req, res, next) {
    try {
-      console.log("before db call");
-      console.log(req.params.id);
       const user = await userDb.getById(Number(req.params.id))
 
       if (!user) {
