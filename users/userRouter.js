@@ -1,6 +1,6 @@
 const express = require("express");
 const usersDb = require("./userDb");
-const { validateUser } = require("../utils/validation");
+const { validateUser, validateId } = require("../utils/validation");
 const { errorResponse500 } = require("../utils/errors");
 
 const router = express.Router();
@@ -37,8 +37,8 @@ router.get("/", async (req, res) => {
    }
 });
 
-router.get("/:id", (req, res) => {
-   // do your magic!
+router.get("/:id", validateId(), (req, res) => {
+   res.json(req.user);
 });
 
 router.get("/:id/posts", (req, res) => {
