@@ -4,7 +4,7 @@ In this challenge, you build an API and write custom middleware that satisfies t
 
 ## Minimum Viable Product
 
--  [ ] Write and implement four custom `middleware` functions, detailed below.
+-  [x] Write and implement four custom `middleware` functions, detailed below.
 -  [ ] Build an API to let clients perform CRUD operations on `users`.
 -  [ ] Add endpoints to retrieve the list of `posts` for a `user` and to store a new `post` for a `user`.
 
