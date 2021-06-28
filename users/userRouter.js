@@ -1,10 +1,23 @@
 const express = require("express");
-const users_db = require("./userDb");
+const usersDb = require("./userDb");
+const { validateUser } = require("../utils/validation");
+const { errorResponse500 } = require("../utils/errors");
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
-   // do your magic!
+router.post("/", validateUser(), async (req, res) => {
+   const { name } = req.body;
+
+   try {
+      const newUser = await usersDb.insert({ name });
+      res.status(201).json(newUser);
+   } catch (error) {
+      errorResponse500(
+         res,
+         error,
+         "There was a problem accessing the user database"
+      );
+   }
 });
 
 router.post("/:id/posts", (req, res) => {
@@ -13,13 +26,14 @@ router.post("/:id/posts", (req, res) => {
 
 router.get("/", async (req, res) => {
    try {
-      const users = await users_db.get();
+      const users = await usersDb.get();
       res.json(users);
    } catch (error) {
-      console.error(
-         `There was a problem accessing the user database:\n${error}`
+      errorResponse500(
+         res,
+         error,
+         "There was a problem accessing the user database"
       );
-      res.status(500).json({ message: "Internal Server error" });
    }
 });
 
@@ -38,19 +52,5 @@ router.delete("/:id", (req, res) => {
 router.put("/:id", (req, res) => {
    // do your magic!
 });
-
-//custom middleware
-
-function validateUserId(req, res, next) {
-   // do your magic!
-}
-
-function validateUser(req, res, next) {
-   // do your magic!
-}
-
-function validatePost(req, res, next) {
-   // do your magic!
-}
 
 module.exports = router;
