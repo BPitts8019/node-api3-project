@@ -1,8 +1,13 @@
 const express = require("express");
 const usersDb = require("./userDb");
-const { validateUser, validateId } = require("../utils/validation");
+const postDb = require("../posts/postDb");
+const {
+   validateUser,
+   validateId,
+   validatePost,
+} = require("../utils/validation");
 const { errorResponse500 } = require("../utils/errors");
-const DB_ERROR = "There was a problem accessing the user database";
+const DB_ERROR = "There was a problem accessing the database";
 
 const router = express.Router();
 
@@ -17,8 +22,14 @@ router.post("/", validateUser(), async (req, res) => {
    }
 });
 
-router.post("/:id/posts", (req, res) => {
-   // do your magic!
+router.post("/:id/posts", validatePost(), validateId(), async (req, res) => {
+   const { id } = req.params;
+   try {
+      const newPost = await postDb.insert({ text: req.body.text, user_id: id });
+      res.status(201).json(newPost);
+   } catch (error) {
+      errorResponse500(res, error, DB_ERROR);
+   }
 });
 
 router.get("/", async (req, res) => {
