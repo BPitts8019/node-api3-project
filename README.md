@@ -15,7 +15,7 @@ In this challenge, you build an API and write custom middleware that satisfies t
    -  `logger` logs to the console the following information about each request: request method, request url, and a timestamp
    -  this middleware runs on every request made to the API
 
--  [ ] `validateUserId()`
+-  [x] `validateUserId()`
 
    -  `validateUserId` validates the user id on every request that expects a user id parameter
    -  if the `id` parameter is valid, store that user object as `req.user`
