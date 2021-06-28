@@ -48,8 +48,16 @@ router.delete("/:id", validateId(), async (req, res) => {
    }
 });
 
-router.put("/:id", (req, res) => {
-   // do your magic!
+router.put("/:id", validateUser(), validateId(), async (req, res) => {
+   const { id } = req.params;
+   try {
+      const numRecs = await usersDb.update(id, { name: req.body.name });
+      console.log(`Num recs updated: ${numRecs}`);
+      req.user = await usersDb.getById(id);
+      res.json(req.user);
+   } catch (error) {
+      errorResponse500(res, error, DB_ERROR);
+   }
 });
 
 module.exports = router;
